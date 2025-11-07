@@ -1,12 +1,24 @@
+// src/components/home/Hero.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
-import { Heroimages , HeroimagesSM } from "../../services/Heroimg";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heroimages, HeroimagesSM } from "../../services/Heroimg";
+import {
+  buttonVariants,
+  fadeUp,
+  transitions,
+} from "../../motion/Motions";
 
 const Hero: React.FC = () => {
-  const [current, setCurrent] = useState(0);
-  const [offsetX, setOffsetX] = useState(0);
+  const [current, setCurrent] = useState<number>(0);
+  const [isClient, setIsClient] = useState(false); // SSR safe
   const startX = useRef<number | null>(null);
   const isDragging = useRef(false);
+  const [offsetX, setOffsetX] = useState(0);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => handleNext(), 5000);
@@ -17,10 +29,25 @@ const Hero: React.FC = () => {
   const handlePrev = () =>
     setCurrent((prev) => (prev - 1 + Heroimages.length) % Heroimages.length);
 
- 
+  const handleStart = (clientX: number) => {
+    isDragging.current = true;
+    startX.current = clientX;
+  };
+
+  const handleMove = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!isDragging.current || startX.current === null) return;
+    const currentX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    setOffsetX(currentX - startX.current);
+  };
 
   const handleEnd = () => {
-    if (!isDragging.current || startX.current === null) return;
+    if (!isDragging.current || startX.current === null) {
+      setOffsetX(0);
+      startX.current = null;
+      isDragging.current = false;
+      return;
+    }
+
     const diff = offsetX;
     const threshold = 100;
 
@@ -37,86 +64,80 @@ const Hero: React.FC = () => {
     isDragging.current = false;
   };
 
-  const handleMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isDragging.current || startX.current === null) return;
-    const currentX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    setOffsetX(currentX - startX.current);
-  };
+  // choose images based on viewport width safely (SSRed-friendly)
+  const images = isClient && window.innerWidth >= 1024 ? Heroimages : HeroimagesSM;
 
   return (
-    <main className="relative overflow-hidden ">
+    <motion.main
+      variants={fadeUp}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      className="relative overflow-hidden"
+    >
       <div
-        className="relative  h-[65vh]   w-full flex items-center justify-center"
-        // onMouseDown={handleStart}
+        className="relative h-[65vh] w-full flex items-center justify-center"
+        onMouseDown={(e) => handleStart(e.clientX)}
         onMouseMove={handleMove}
         onMouseUp={handleEnd}
         onMouseLeave={handleEnd}
-      
+        onTouchStart={(e) => handleStart(e.touches[0].clientX)}
+        onTouchMove={handleMove}
+        onTouchEnd={handleEnd}
       >
-        <div
-          className=" hidden lg:flex absolute inset-0 transition-transform duration-700 ease-in-out"
-          style={{ transform: `translateX(${offsetX}px)` }}
-        >
-          {Heroimages.map((item, index) => (
-            <img
-              key={index}
-              src={item.img}
-              alt={`slide-${index}`}
-              className={`absolute inset-0 w-full md:object-contain lg:object-cover transition-all duration-[1200ms] ease-in-out ${
-                index === current
-                  ? "opacity-100 scale-100"
-                  : "opacity-0 scale-110"
-              }`}
-            />
-          ))}
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={current}
+            src={images[current].img}
+            alt={`slide-${current}`}
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ opacity: 0, scale: 1.08 }}
+            animate={{ opacity: 1, scale: 1, transition: transitions.slow }}
+            exit={{ opacity: 0, scale: 0.98, transition: transitions.fast }}
+            draggable={false}
+          />
+        </AnimatePresence>
 
-
-         <div
-          className="flex lg:hidden absolute inset-0 transition-transform duration-700 ease-in-out"
-          style={{ transform: `translateX(${offsetX}px)` }}
-        >
-          {HeroimagesSM.map((item, index) => (
-            <img
-              key={index}
-              src={item.img}
-              alt={`slide-${index}`}
-              className={`absolute inset-0 w-full h-auto  object-cover transition-all duration-[1200ms] ease-in-out ${
-                index === current
-                  ? "opacity-100 scale-100"
-                  : "opacity-0 scale-110"
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Buttons */}
-        <button
+        <motion.button
+          variants={buttonVariants}
+          initial="initial"
+          whileHover="hover"
+          whileTap="tap"
           onClick={handlePrev}
-          className="absolute left-4 top-40 sm:top-60 md:top-60    lg:top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-2 rounded-full transition"
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-2 rounded-full"
+          aria-label="Previous slide"
         >
           <IoChevronBack size={24} />
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
+          variants={buttonVariants}
+          initial="initial"
+          whileHover="hover"
+          whileTap="tap"
           onClick={handleNext}
-          className="absolute right-4 top-40 sm:top-60 md:top-60  lg:top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-2 rounded-full transition"
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-2 rounded-full"
+          aria-label="Next slide"
         >
           <IoChevronForward size={24} />
-        </button>
+        </motion.button>
       </div>
 
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+      <motion.div
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10"
+        variants={fadeUp}
+        initial="initial"
+        animate="animate"
+      >
         {Heroimages.map((_, idx) => (
-          <div
+          <motion.div
             key={idx}
-            className={`h-2 w-2 rounded-full transition-all ${
-              current === idx ? "bg-white w-4" : "bg-white/50"
-            }`}
+            className={`h-2 rounded-full ${current === idx ? "bg-white w-4" : "bg-white/50 w-2"}`}
+            animate={current === idx ? { scale: [1, 1.3, 1], transition: { duration: 0.6 } } : { scale: 1 }}
           />
         ))}
-      </div>
-    </main>
+      </motion.div>
+    </motion.main>
   );
 };
 

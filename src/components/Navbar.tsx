@@ -21,13 +21,17 @@ const Navbar = () => {
     {
       label: "Our Products",
       dropdown: [
-        { label: "A2 Ghee", href: "/a2-ghee" },
         { label: "All Products", href: "/products" },
+        { label: "A2 Desi Cow Ghee", href: "/a2-ghee" },
+        { label: "Cow & Buffalo Bilona Ghee", href: "/a2-ghee" },
+        { label: "Cold Pressed Oil", href: "/a2-ghee" },
+        { label: "Pickle", href: "/a2-ghee" },
+        { label: "Natural Honey", href: "/a2-ghee" },
       ],
     },
     { label: "Our Story", href: "/story" },
     { label: "Contact", href: "/contact" },
-    { label: "Track Order", href: "/track" },
+    { label: "Track Order", href: "/trackyourorder" },
   ];
 
   return (
@@ -48,13 +52,14 @@ const Navbar = () => {
           </div>
 
           {/* LEFT: Desktop Menu */}
-          <nav className="hidden lg:flex items-center space-x-6 flex-1">
+          <nav className="hidden lg:flex items-center space-x-6 flex-1 ">
             {navLinks.map((item) => (
               <div key={item.label} className="relative group">
                 {item.dropdown ? (
                   <button
                     className="flex items-center gap-1 text-gray-700 hover:text-green-700 font-bold transition-colors"
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    onMouseEnter={() => setDropdownOpen(!dropdownOpen) }
+                    onClick={() => setDropdownOpen(!dropdownOpen) }
                   >
                     {item.label}
                     <IoChevronDownOutline
@@ -73,12 +78,12 @@ const Navbar = () => {
 
                 {/* Dropdown */}
                 {item.dropdown && dropdownOpen && (
-                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20 border">
+                  <div className="absolute left-0 mt-2 w-60 bg-white rounded-md shadow-lg py-2 z-20 border">
                     {item.dropdown.map((sub) => (
                       <a
                         key={sub.label}
                         href={sub.href}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700"
+                        className="block px-4 py-2 text-sm text-amber-400 hover:bg-green-50 hover:text-green-700"
                       >
                         {sub.label}
                       </a>

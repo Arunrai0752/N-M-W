@@ -1,7 +1,9 @@
 import React, { useRef } from "react";
+import { motion } from "framer-motion";
 import { Blogs } from "../../services/Blogs/Blog";
+import { fadeUp, cardVariant, buttonVariants } from "../../motion/Motions";
 
-const Ourblog = () => {
+const Ourblog: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isDown = useRef(false);
   const startX = useRef(0);
@@ -31,11 +33,12 @@ const Ourblog = () => {
   };
 
   return (
-    <main>
+    <motion.main variants={fadeUp} initial="initial" animate="animate" exit="exit">
       <div className="h-auto w-screen py-20 bg-white">
-        <h1 className="text-5xl text-center w-full  text-[#0c7748]">
+        <motion.h1 variants={fadeUp} className="text-5xl text-center w-full  text-[#0c7748]">
           Our Blogs
-        </h1>
+        </motion.h1>
+
         <div className="w-full flex justify-center">
           <div
             ref={scrollRef}
@@ -46,8 +49,11 @@ const Ourblog = () => {
             onMouseMove={handleMouseMove}
           >
             {Blogs.map((blog) => (
-              <div
+              <motion.div
                 key={blog.id}
+                variants={cardVariant}
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ duration: 0.25 }}
                 className="bg-white rounded-xl shadow hover:shadow-lg transition-all duration-300"
               >
                 <img src={blog.image} alt={blog.title} className="w-120" />
@@ -71,18 +77,24 @@ const Ourblog = () => {
                     {blog.publishedDate}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
 
         <div className="flex justify-center items-center pt-5 ">
-          <button className=" bg-[#0C7748] px-4 py-2 rounded-3xl ">
+          <motion.button
+            variants={buttonVariants}
+            initial="initial"
+            whileHover="hover"
+            whileTap="tap"
+            className=" bg-[#0C7748] px-4 py-2 rounded-3xl "
+          >
             View All Product
-          </button>
+          </motion.button>
         </div>
       </div>
-    </main>
+    </motion.main>
   );
 };
 
