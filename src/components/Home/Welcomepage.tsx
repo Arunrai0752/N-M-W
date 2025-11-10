@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import Cow from "../../assets/Cow1.webp";
+import Cow from "../../assets/Cow1..png";
 import { fadeUp, subtleScale, buttonVariants } from "../../motion/Motions";
 
 const Welcomepage: React.FC = () => {
@@ -11,7 +11,7 @@ const Welcomepage: React.FC = () => {
       animate="animate"
       exit="exit"
     >
-      <div className="xl:flex grid items-center justify-center min-w-full">
+      <div className="xl:flex grid items-center justify-center min-w-full py-10 sm:gap-10  px-5">
         <motion.div
           variants={subtleScale}
           className="h-auto bg-white flex justify-center items-center w-full xl:w-1/2"

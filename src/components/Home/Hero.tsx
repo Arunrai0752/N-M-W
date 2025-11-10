@@ -16,6 +16,7 @@ const Hero: React.FC = () => {
   const isDragging = useRef(false);
   const [offsetX, setOffsetX] = useState(0);
 
+
   useEffect(() => {
     setIsClient(true);
   }, []);
